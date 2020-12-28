@@ -77,12 +77,9 @@ def json_serial(obj):
 if __name__ == '__main__':
     with open('.env.yaml', 'r') as f:
         env = yaml.safe_load(f)
-        gcs_bucket_name = env.get('GCS_BUCKET_NAME')
-        if gcs_bucket_name:
-            os.environ['GCS_BUCKET_NAME'] = gcs_bucket_name
-        gcp_credentials_path = env.get('GCP_CREDENTIALS_PATH')
-        if gcp_credentials_path:
-            os.environ['GCP_CREDENTIALS_PATH'] = gcp_credentials_path
+        for k, v in env.items():
+            if not isinstance(v, (list, dict)):
+                os.environ[k] = v
 
     event = {'attributes': {
         'channel_id': sys.argv[1], 'video_id': sys.argv[2]}}

@@ -99,24 +99,9 @@ def mark_as_unntouched_video(topic_name, channel_id, video_id, project_id=None, 
 if __name__ == '__main__':
     with open('.env.yaml', 'r') as f:
         env = yaml.safe_load(f)
-        gcs_bucket_name = env.get('GCS_BUCKET_NAME')
-        if gcs_bucket_name:
-            os.environ['GCS_BUCKET_NAME'] = gcs_bucket_name
-        gcp_credentials_path = env.get('GCP_CREDENTIALS_PATH')
-        if gcp_credentials_path:
-            os.environ['GCP_CREDENTIALS_PATH'] = gcp_credentials_path
-        pubsub_topic_name = env.get('PUBSUB_TOPIC_NAME')
-        if pubsub_topic_name:
-            os.environ['PUBSUB_TOPIC_NAME'] = pubsub_topic_name
-        project_id = env.get('PUBSUB_PROJECT_ID')
-        if project_id:
-            os.environ['PUBSUB_PROJECT_ID'] = project_id
-        gcs_videos_prefix = env.get('GCS_VIDEOS_PREFIX')
-        if gcs_videos_prefix:
-            os.environ['GCS_VIDEOS_PREFIX'] = gcs_videos_prefix
-        gcs_comments_prefix = env.get('GCS_COMMENTS_PREFIX')
-        if gcs_comments_prefix:
-            os.environ['GCS_COMMENTS_PREFIX'] = gcs_comments_prefix
+        for k, v in env.items():
+            if not isinstance(v, (list, dict)):
+                os.environ[k] = v
 
     event = {'name': sys.argv[1]}
 
