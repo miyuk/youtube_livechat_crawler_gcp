@@ -18,9 +18,10 @@ def main(event, context):
     gcs_comments_prefix = os.environ.get('GCS_COMMENTS_PREFIX').rstrip('/')
 
     credentials = None
-    if gcp_credentials_path:
+    if gcp_credentials_path and os.path.exists(gcp_credentials_path):
         credentials = Credentials.from_service_account_file(
             gcp_credentials_path)
+        print(f'load credential file "{gcp_credentials_path}')
 
     finalized_blob_path = event['name']
     if not finalized_blob_path.startswith(f'{gcs_videos_prefix}/'):

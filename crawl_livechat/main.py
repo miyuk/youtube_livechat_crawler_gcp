@@ -15,9 +15,11 @@ def main(event, context):
     gcp_credentials_path = os.environ.get('GCP_CREDENTIALS_PATH')
 
     credentials = None
-    if gcp_credentials_path:
+    if gcp_credentials_path and os.path.exists(gcp_credentials_path):
         credentials = Credentials.from_service_account_file(
             gcp_credentials_path)
+        print(f'load credential file "{gcp_credentials_path}')
+
     channel_id = event['attributes']['channel_id']
     video_id = event['attributes']['video_id']
     blob_path = f'comments/{channel_id}/{video_id}.json'

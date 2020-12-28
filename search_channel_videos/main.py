@@ -16,9 +16,10 @@ def main(request):
     videos_prefix = os.environ.get('GCS_VIDEOS_PREFIX').rstrip('/')
     gcp_credentials_path = os.environ.get('GCP_CREDENTIALS_PATH')
     credentials = None
-    if gcp_credentials_path:
+    if gcp_credentials_path and os.path.exists(gcp_credentials_path):
         credentials = Credentials.from_service_account_file(
             gcp_credentials_path)
+        print(f'load credential file "{gcp_credentials_path}')
 
     channels = get_json(bucket_name, 'channels.json', credentials)
     print(f'channel count: {len(channels)}')
