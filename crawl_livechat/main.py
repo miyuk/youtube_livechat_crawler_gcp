@@ -13,6 +13,7 @@ from youtube_livechat_scraper import YoutubeLiveChatScraper
 def main(event, context):
     bucket_name = os.environ.get('GCS_BUCKET_NAME')
     gcp_credentials_path = os.environ.get('GCP_CREDENTIALS_PATH')
+    comments_prefix = os.environ.get('GCS_COMMENTS_PREFIX').rstrip('/')
 
     credentials = None
     if gcp_credentials_path and os.path.exists(gcp_credentials_path):
@@ -22,7 +23,7 @@ def main(event, context):
 
     channel_id = event['attributes']['channel_id']
     video_id = event['attributes']['video_id']
-    blob_path = f'comments/{channel_id}/{video_id}.json'
+    blob_path = f'{comments_prefix}/{channel_id}/{video_id}.json'
 
     print(f'get video comments of {video_id}')
     video_comments = get_comments(video_id)

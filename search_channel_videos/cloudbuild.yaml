@@ -1,0 +1,20 @@
+steps:
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - functions
+      - deploy
+      - ${_FUNCTION_NAME}
+      - --region=${_REGION}
+      - --service-account=${_SERVICE_ACCOUNT}
+      - --source=./
+      - --runtime=python38
+      - --entry-point=main
+      - --trigger-http
+      - --allow-unauthenticated
+      - --timeout=180
+      - --env-vars-file=.env.yaml
+substitutions:
+  _FUNCTION_NAME: search_channel_videos
+  _REGION: asia-northeast1
+  _SERVICE_ACCOUNT: ""

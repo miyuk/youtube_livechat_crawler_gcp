@@ -1,5 +1,5 @@
 .gcloudignore
 __pychache__/
-.env.yaml
 .env.yaml.sample
 secrets/
+cloudbuild.yaml

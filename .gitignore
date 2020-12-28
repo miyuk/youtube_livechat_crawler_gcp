@@ -133,16 +133,15 @@ dmypy.json
 
 # search_channel_videos
 /search_channel_videos/.env.yaml
-/search_channel_videos/channels.json
 /search_channel_videos/secrets/*
 !/search_channel_videos/secrets/.gitkeep
-
-# crawl_livechat
-/crawl_livechat/.env.yaml
-/crawl_livechat/secrets/*
-!/crawl_livechat/secrets/.gitkeep
 
 # check_untouched_video
 /check_untouched_video/.env.yaml
 /check_untouched_video/secrets/*
 !/check_untouched_video/secrets/.gitkeep
+
+# crawl_livechat
+/crawl_livechat/.env.yaml
+/crawl_livechat/secrets/*
+!/crawl_livechat/secrets/.gitkeep

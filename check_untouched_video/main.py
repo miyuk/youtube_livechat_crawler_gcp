@@ -14,8 +14,8 @@ def main(event, context):
     gcp_credentials_path = os.environ.get('GCP_CREDENTIALS_PATH')
     project_id = os.environ.get('PUBSUB_PROJECT_ID')
     topic_name = os.environ.get('PUBSUB_TOPIC_NAME')
-    gcs_videos_prefix = os.environ.get('GCS_VIDEOS_PREFIX').rstrip('/')
-    gcs_comments_prefix = os.environ.get('GCS_COMMENTS_PREFIX').rstrip('/')
+    videos_prefix = os.environ.get('GCS_VIDEOS_PREFIX').rstrip('/')
+    comments_prefix = os.environ.get('GCS_COMMENTS_PREFIX').rstrip('/')
 
     credentials = None
     if gcp_credentials_path and os.path.exists(gcp_credentials_path):
@@ -24,14 +24,14 @@ def main(event, context):
         print(f'load credential file "{gcp_credentials_path}')
 
     finalized_blob_path = event['name']
-    if not finalized_blob_path.startswith(f'{gcs_videos_prefix}/'):
+    if not finalized_blob_path.startswith(f'{videos_prefix}/'):
         print(
-            f'updated blob({finalized_blob_path}) does not contaion prefix({gcs_videos_prefix}/)')
+            f'updated blob({finalized_blob_path}) does not contaion prefix({videos_prefix}/)')
         return
 
     channel_id = None
 
-    m = re.search(rf'{gcs_videos_prefix}/(.+)\.json', finalized_blob_path)
+    m = re.search(rf'{videos_prefix}/(.+)\.json', finalized_blob_path)
     if m:
         channel_id = m.group(1)
     else:
@@ -39,7 +39,7 @@ def main(event, context):
             f'cannnot recognize channel_id from path: {finalized_blob_path}')
 
     videos = get_json(bucket_name, finalized_blob_path, credentials)
-    comments_prefix = f'{gcs_comments_prefix}/{channel_id}'
+    comments_prefix = f'{comments_prefix}/{channel_id}'
     comments_blobs = list(get_blob_list(
         bucket_name, comments_prefix, credentials))
 
