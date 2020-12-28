@@ -131,18 +131,18 @@ dmypy.json
 # vscode
 .vscode/
 
-# search_channel_video
-/search_channel_video/.env.yaml
-/search_channel_video/channels.json
-/search_channel_video/secrets/*
-!/search_channel_video/secrets/.gitkeep
+# search_channel_videos
+/search_channel_videos/.env.yaml
+/search_channel_videos/channels.json
+/search_channel_videos/secrets/*
+!/search_channel_videos/secrets/.gitkeep
 
 # crawl_livechat
 /crawl_livechat/.env.yaml
 /crawl_livechat/secrets/*
 !/crawl_livechat/secrets/.gitkeep
 
-# check_untouched_videos
-/check_untouched_videos/.env.yaml
-/check_untouched_videos/secrets/*
-!/check_untouched_videos/secrets/.gitkeep
+# check_untouched_video
+/check_untouched_video/.env.yaml
+/check_untouched_video/secrets/*
+!/check_untouched_video/secrets/.gitkeep
