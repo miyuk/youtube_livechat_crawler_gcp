@@ -8,6 +8,9 @@
 - Create Cloud Storage Bucket  
    ex. `youtube-livechat-crawler`
 
+- Create Cloud Pub/Sub  
+   ex. `youtube-livechat-crawler`
+
 ## How to deploy
 
 ### `search_channel_videos`
