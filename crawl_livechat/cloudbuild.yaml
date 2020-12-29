@@ -11,8 +11,8 @@ steps:
       - --runtime=python38
       - --entry-point=main
       - --trigger-topic=${_TRIGGER_PUBSUB_TOPIC}
-      - --allow-unauthenticated
       - --timeout=540
+      - --memory=512MB
       - --env-vars-file=.env.yaml
 substitutions:
   _FUNCTION_NAME: crawl_livechat

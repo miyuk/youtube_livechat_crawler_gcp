@@ -38,10 +38,11 @@ def main(event, context):
         raise Exception(
             f'cannnot recognize channel_id from path: {finalized_blob_path}')
 
-    videos = get_json(bucket_name, finalized_blob_path, credentials)
+    videos = get_json(bucket_name, finalized_blob_path,
+                      credentials=credentials)
     comments_prefix = f'{comments_prefix}/{channel_id}'
     comments_blobs = list(get_blob_list(
-        bucket_name, comments_prefix, credentials))
+        bucket_name, comments_prefix, credentials=credentials))
 
     if not videos:
         print(f'missing videos of {channel_id}')
@@ -54,8 +55,13 @@ def main(event, context):
         print(f'check video_id: {video_id}')
 
         if f'{comments_prefix}/{video_id}.json' not in [x.name for x in comments_blobs]:
-            result = mark_as_unntouched_video(
-                topic_name, channel_id, video_id, project_id, credentials)
+            print(f'publish message of {video_id}')
+            message = json.dumps({
+                'channel_id': channel_id,
+                'video_id': video_id
+            }, ensure_ascii=False)
+            result = publish_message(
+                topic_name, project_id, message, credentials=credentials)
             print(f'{video_id} Pub/Sub result: {result}')
 
 
@@ -66,8 +72,7 @@ def get_blob_list(bucket_name, prefix, credentials=None):
     storage_client = storage.Client(
         project=project_id, credentials=credentials)
     bucket = storage_client.get_bucket(bucket_name)
-    blob_list = bucket.list_blobs(prefix=prefix, delimiter='/')
-
+    blob_list = bucket.list_blobs(prefix=f'{prefix}/', delimiter='/')
     return blob_list
 
 
@@ -87,12 +92,12 @@ def get_json(bucket_name, blob_path, credentials=None):
     return data
 
 
-def mark_as_unntouched_video(topic_name, channel_id, video_id, project_id=None, credentials=None):
+def publish_message(topic_name, project_id, message, attributes={}, credentials=None):
     publisher = pubsub_v1.PublisherClient(credentials=credentials)
 
     topic_path = publisher.topic_path(project_id, topic_name)
-    future = publisher.publish(topic_path, 'untouched_video'.encode(
-        'utf-8'), channel_id=channel_id, video_id=video_id)
+    future = publisher.publish(topic_path, str(
+        message).encode('utf-8'), **attributes)
 
     return future.result()
 
@@ -102,7 +107,7 @@ if __name__ == '__main__':
         env = yaml.safe_load(f)
         for k, v in env.items():
             if not isinstance(v, (list, dict)):
-                os.environ[k] = v
+                os.environ[k] = str(v)
 
     event = {'name': sys.argv[1]}
 

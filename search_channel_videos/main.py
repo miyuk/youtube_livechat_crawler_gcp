@@ -154,6 +154,6 @@ if __name__ == '__main__':
         env = yaml.safe_load(f)
         for k, v in env.items():
             if not isinstance(v, (list, dict)):
-                os.environ[k] = v
+                os.environ[k] = str(v)
 
     main(None)

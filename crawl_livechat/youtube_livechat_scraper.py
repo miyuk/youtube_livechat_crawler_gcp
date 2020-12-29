@@ -47,7 +47,7 @@ class YoutubeLiveChatScraper(object):
 
     def get_livechat_from_continuation(self, continuation):
         comments = []
-        next_continuation = ''
+        next_continuation = None
 
         continuation_url = f'https://www.youtube.com/live_chat_replay?continuation={continuation}'
         html = self.session.get(continuation_url, headers=self.headers)
@@ -63,7 +63,7 @@ class YoutubeLiveChatScraper(object):
                     data = json.loads(m.group(1))
                     livechat_continuation = data['continuationContents']['liveChatContinuation']
                     if 'continuations' not in livechat_continuation or 'actions' not in livechat_continuation:
-                        print('not found livechat data ')
+                        print('next continuations is nothing')
                         break
 
                     actions_data = livechat_continuation['actions']
@@ -99,9 +99,9 @@ class YoutubeLiveChatScraper(object):
         item = {}
         if 'purchaseAmountText' in renderer:
             item['amountString'] = renderer['purchaseAmountText']['simpleText']
-            item['type'] = 'textMessage'
-        else:
             item['type'] = 'superChat'
+        else:
+            item['type'] = 'textMessage'
         item['id'] = renderer['id']
         item['timestamp'] = int(renderer['timestampUsec']) / 1000000
         item['datetime'] = datetime.fromtimestamp(item['timestamp'])
