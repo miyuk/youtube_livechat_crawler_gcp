@@ -7,7 +7,7 @@ import yaml
 from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
 from google.cloud import storage, pubsub_v1
-from youtube_livechat_scraper import YoutubeLiveChatScraper
+from youtube_livechat_scraper import YoutubeLiveChatScraper, NoCommentsError, VideoAccessDeniedError
 
 
 def main(event, context):
@@ -38,29 +38,49 @@ def main(event, context):
         current_comments = []
     print(f'curent comments count: {len(current_comments)}')
 
-    print(f'get video comments of {video_id}')
-    new_comments, last_continuation = get_comments(
-        video_id, continuation, duration_seconds)
+    try:
+        print(f'get video comments of {video_id}')
+        new_comments, last_continuation = get_comments(
+            video_id, continuation, duration_seconds)
 
-    total_comments = current_comments
-    for comment in new_comments:
-        if comment['id'] not in [x['id'] for x in current_comments]:
-            total_comments.append(comment)
-    print(f'add comments count: {len(total_comments) - len(current_comments)}')
-    print(f'upload video comments of {video_id}')
-    upload_json(bucket_name, blob_path, total_comments,
-                credentials=credentials)
+        total_comments = current_comments
+        current_comment_ids = [x['id'] for x in current_comments]
+        for comment in new_comments:
+            if comment['id'] not in current_comment_ids:
+                total_comments.append(comment)
+        print(
+            f'add comments count: {len(total_comments) - len(current_comments)}')
+        print(f'upload video comments of {video_id}')
+        upload_json(bucket_name, blob_path, total_comments,
+                    credentials=credentials)
 
-    if last_continuation:
-        print(f'function timeout, next continuation: {last_continuation}')
-        message = json.dumps({
-            'channel_id': channel_id,
-            'video_id': video_id,
-            'continuation': last_continuation
-        }, ensure_ascii=False)
-        result = publish_message(
-            topic_name, project_id, message, credentials=credentials)
-        print(f'{video_id} Pub/Sub result: {result}')
+        if last_continuation:
+            print(f'function timeout, next continuation: {last_continuation}')
+            message = json.dumps({
+                'channel_id': channel_id,
+                'video_id': video_id,
+                'continuation': last_continuation
+            }, ensure_ascii=False)
+            result = publish_message(
+                topic_name, project_id, message, credentials=credentials)
+            print(f'{video_id} Pub/Sub result: {result}')
+    except (NoCommentsError, VideoAccessDeniedError) as e:
+        print(f'{type(e).__name__}: {str(e.args)}')
+        # データ取得できなかった場合、Videoを検索無視登録
+        ignore_videos = get_json(
+            bucket_name, 'ignore_videos.json', credentials=credentials)
+        ignore_videos = ignore_videos if ignore_videos else []
+
+        if video_id not in [x['video_id'] for x in ignore_videos]:
+            print(f'add ignore videos list: {video_id}')
+            data = {
+                'channel_id': channel_id,
+                'video_id': video_id,
+                'ignore_reason': f'{type(e).__name__}: {str(e.args)}'
+            }
+            ignore_videos.append(data)
+            upload_json(bucket_name, 'ignore_videos.json',
+                        ignore_videos, credentials=credentials)
 
 
 # 時間切れの場合は、"continuation"も返す

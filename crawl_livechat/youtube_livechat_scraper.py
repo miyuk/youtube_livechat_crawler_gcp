@@ -1,11 +1,20 @@
 # -*- coding: utf-8 -*-
 
+from copy import Error
 import json
 import requests
 import re
 import esprima
 from bs4 import BeautifulSoup
 from datetime import datetime
+
+
+class NoCommentsError(Exception):
+    pass
+
+
+class VideoAccessDeniedError(Exception):
+    pass
 
 
 class YoutubeLiveChatScraper(object):
@@ -30,8 +39,18 @@ class YoutubeLiveChatScraper(object):
                 m = re.search(r'var\s+ytInitialData\s*=\s*(.+)', line)
                 if m:
                     data = json.loads(m.group(1))
-                    sub_menus = data['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer'][
-                        'header']['liveChatHeaderRenderer']['viewSelector']['sortFilterSubMenuRenderer']['subMenuItems']
+                    # 'contents'がない場合は、動画非公開判定
+                    if 'contents' not in data:
+                        raise VideoAccessDeniedError('Private video')
+
+                    # 'liveChatRenderer'がない場合、コメント非公開判定
+                    conversation_bar = data['contents']['twoColumnWatchNextResults']['conversationBar']
+                    if 'liveChatRenderer' not in conversation_bar:
+                        raise NoCommentsError(
+                            'Live chat replay is not available for this video')
+
+                    sub_menus = conversation_bar['liveChatRenderer']['header']['liveChatHeaderRenderer'][
+                        'viewSelector']['sortFilterSubMenuRenderer']['subMenuItems']
                     sub_menu_titles = [x['title'] for x in sub_menus]
                     all_chat_menu = [
                         x for x in sub_menus if x['title'] in ('Live chat replay', 'チャットのリプレイ')]

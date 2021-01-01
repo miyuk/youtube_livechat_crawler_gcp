@@ -50,8 +50,10 @@ def main(request):
         channel_videos = unique_list(channel_videos)
         channel_videos.sort(key=lambda x: x['published_at'])
         print(f'total video count: {len(channel_videos)}')
-        upload_videos(bucket_name, blob_path, channel_videos, credentials)
-        print(f'complete uploading videos of "{channel_name}({channel_id})"')
+        if len(new_videos) > 0:
+            upload_videos(bucket_name, blob_path, channel_videos, credentials)
+            print(
+                f'complete uploading videos of "{channel_name}({channel_id})"')
 
     return 'search_channel_videos is completed'
 

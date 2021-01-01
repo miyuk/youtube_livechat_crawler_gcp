@@ -38,6 +38,10 @@ def main(event, context):
         raise Exception(
             f'cannnot recognize channel_id from path: {finalized_blob_path}')
 
+    ignore_videos = get_json(
+        bucket_name, 'ignore_videos.json', credentials=credentials)
+    ignore_videos = ignore_videos if ignore_videos else []
+
     videos = get_json(bucket_name, finalized_blob_path,
                       credentials=credentials)
     comments_prefix = f'{comments_prefix}/{channel_id}'
@@ -55,6 +59,10 @@ def main(event, context):
         print(f'check video_id: {video_id}')
 
         if f'{comments_prefix}/{video_id}.json' not in [x.name for x in comments_blobs]:
+            if video_id in [x['video_id'] for x in ignore_videos]:
+                print(f'ignore video: {video_id}')
+                continue
+
             print(f'publish message of {video_id}')
             message = json.dumps({
                 'channel_id': channel_id,
