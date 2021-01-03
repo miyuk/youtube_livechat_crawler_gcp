@@ -3,3 +3,4 @@ __pychache__/
 .env.yaml.sample
 secrets/
 cloudbuild.yaml
+local_run.py

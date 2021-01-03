@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import yaml
+import base64
 from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
 from google.cloud import storage, pubsub_v1
@@ -24,7 +25,7 @@ def main(event, context):
             gcp_credentials_path)
         print(f'load credential file "{gcp_credentials_path}')
 
-    data = json.loads(event['data'])
+    data = json.loads(base64.b64decode(event['data']).decode('utf-8'))
 
     channel_id = data['channel_id']
     video_id = data['video_id']
