@@ -24,7 +24,7 @@ def main(event, context):
             gcp_credentials_path)
         print(f'load credential file "{gcp_credentials_path}')
 
-    data = json.loads(event['data'].decode('utf-8'))
+    data = json.loads(event['data'])
 
     channel_id = data['channel_id']
     video_id = data['video_id']
@@ -178,6 +178,6 @@ if __name__ == '__main__':
         'video_id': video_id,
         'continuation': continuation
     }
-    event = {'data': json.dumps(data, ensure_ascii=False).encode('utf-8')}
+    event = {'data': json.dumps(data, ensure_ascii=False)}
 
     main(event, None)
