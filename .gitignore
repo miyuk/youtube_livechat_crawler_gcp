@@ -145,3 +145,8 @@ dmypy.json
 /crawl_livechat/.env.yaml
 /crawl_livechat/secrets/*
 !/crawl_livechat/secrets/.gitkeep
+
+# convert_bigquery_data
+/convert_bigquery_data/.env.yaml
+/convert_bigquery_data/secrets/*
+!/convert_bigquery_data/secrets/.gitkeep
