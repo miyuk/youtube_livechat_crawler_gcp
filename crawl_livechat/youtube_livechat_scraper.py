@@ -43,8 +43,14 @@ class YoutubeLiveChatScraper(object):
                     if 'contents' not in data:
                         raise VideoAccessDeniedError('Private video')
 
+                    # 'conversationBar'がない場合、エラー判定
+                    columns = data['contents']['twoColumnWatchNextResults']
+                    if 'conversationBar' in columns:
+                        raise NoCommentsError(
+                            f'Not found conversationBar, selected items: {set(columns.keys())}')
+
                     # 'liveChatRenderer'がない場合、コメント非公開判定
-                    conversation_bar = data['contents']['twoColumnWatchNextResults']['conversationBar']
+                    conversation_bar = columns['conversationBar']
                     if 'liveChatRenderer' not in conversation_bar:
                         raise NoCommentsError(
                             'Live chat replay is not available for this video')
