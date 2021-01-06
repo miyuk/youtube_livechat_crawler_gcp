@@ -73,14 +73,14 @@ def main(event, context):
             print(f'{video_id} Pub/Sub result: {result}')
 
 
-def get_blob_list(bucket_name, prefix, credentials=None):
+def get_blob_list(bucket_name, prefix, delimiter=None, credentials=None):
     project_id = None
     if credentials:
         project_id = credentials.project_id
     storage_client = storage.Client(
         project=project_id, credentials=credentials)
     bucket = storage_client.get_bucket(bucket_name)
-    blob_list = bucket.list_blobs(prefix=f'{prefix}/', delimiter='/')
+    blob_list = bucket.list_blobs(prefix=f'{prefix}/', delimiter=delimiter)
     return blob_list
 
 
