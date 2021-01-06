@@ -21,14 +21,15 @@ def main(request):
             gcp_credentials_path)
         print(f'load credential file "{gcp_credentials_path}')
 
-    channels = get_json(bucket_name, 'channels.json', credentials)
+    channels = get_json(bucket_name, 'channels.json', credentials=credentials)
     print(f'channel count: {len(channels)}')
 
     for channel in channels:
         channel_name = channel['name']
         channel_id = channel['channel_id']
         blob_path = f'{videos_prefix}/{channel_id}.json'
-        channel_videos = get_json(bucket_name, blob_path, credentials)
+        channel_videos = get_json(
+            bucket_name, blob_path, credentials=credentials)
 
         print(f'start loading videos of "{channel_name}({channel_id})"')
 
@@ -51,7 +52,8 @@ def main(request):
         channel_videos.sort(key=lambda x: x['published_at'])
         print(f'total video count: {len(channel_videos)}')
         if len(new_videos) > 0:
-            upload_videos(bucket_name, blob_path, channel_videos, credentials)
+            upload_videos(bucket_name, blob_path, channel_videos,
+                          credentials=credentials)
             print(
                 f'complete uploading videos of "{channel_name}({channel_id})"')
 
