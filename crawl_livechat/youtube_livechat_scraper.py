@@ -45,7 +45,7 @@ class YoutubeLiveChatScraper(object):
 
                     # 'conversationBar'がない場合、エラー判定
                     columns = data['contents']['twoColumnWatchNextResults']
-                    if 'conversationBar' in columns:
+                    if 'conversationBar' not in columns:
                         raise NoCommentsError(
                             f'Not found conversationBar, selected items: {set(columns.keys())}')
 
