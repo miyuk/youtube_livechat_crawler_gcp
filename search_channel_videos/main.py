@@ -107,6 +107,7 @@ def get_videos(channel_id, api_key, after=None):
                 video_item = {}
                 video_item['video_id'] = search_item['id']['videoId']
                 video_item['channel_id'] = search_item['snippet']['channelId']
+                video_item['channelTitle'] = search_item['snippet']['channelTitle']
                 video_item['title'] = search_item['snippet']['title']
                 video_item['published_at'] = search_item['snippet']['publishedAt']
 
