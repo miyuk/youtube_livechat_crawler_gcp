@@ -30,26 +30,32 @@ def main(event, context):
             f'updated blob({finalized_blob_path}) does not contaion prefix({comments_prefix}/)')
         return
 
-    print(f'load input blob: {finalized_blob_path}')
-    data = get_json(bucket_name, finalized_blob_path, credentials=credentials)
-    if not data:
-        print(f'not found: {finalized_blob_path}')
-        return
-
     input_path = Path(finalized_blob_path)
     channel_id = str(input_path.parents[0].name)
     video_id = str(input_path.stem)
     output_path = str(f'{bigquery_prefix}/{channel_id}/{video_id}.ndjson')
     videos_path = f'{videos_prefix}/{channel_id}.json'
 
-    # チャンネル情報も追加
+    # ビデオ一覧にない場合はスキップ
     channel_videos = get_json(
         bucket_name, videos_path, credentials=credentials)
+    if not channel_videos:
+        print(f'not found video: {video_id}')
+        return
+
     video = [x for x in channel_videos if x['video_id'] == video_id]
     if not video:
         print(f'not found video: {video_id}')
         return
+
     video = video[0]
+
+    print(f'load input blob: {finalized_blob_path}')
+    data = get_json(bucket_name, finalized_blob_path, credentials=credentials)
+    if not data:
+        print(f'not found: {finalized_blob_path}')
+        return
+
     for item in data:
         item['video_id'] = video['video_id']
         item['channel_id'] = video['channel_id']
